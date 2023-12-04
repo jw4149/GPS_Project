@@ -76,7 +76,7 @@ def handle_sndr(sndr_sk, addr):
                 except InvalidSignature:
                     print("pk-sk validation did not pass.")
                 print("Session", session, "finished.")
-                
+
             else:
                 # Verify the prev_msg with received key
                 hm = hmac.HMAC(key, hashes.SHA256())
@@ -102,7 +102,7 @@ def handle_sndr(sndr_sk, addr):
 
 def receive_data():
     rcv_sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    rcv_sk.bind((socket.gethostname(), 12348))
+    rcv_sk.bind((socket.gethostname(), 12349))
     rcv_sk.listen(5)
 
     print("Receiver ready.")

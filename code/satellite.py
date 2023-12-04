@@ -23,7 +23,7 @@ with open(pk_path, 'wb') as pk_file:
 def send_data():
     global session
     sndr_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sndr_socket.connect((socket.gethostname(), 12348))
+    sndr_socket.connect((socket.gethostname(), 12349))
     
     try:
         for session in range(1, 10):

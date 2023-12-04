@@ -7,7 +7,7 @@ session = 0
 def send_data():
     global session
     sndr_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sndr_socket.connect((socket.gethostname(), 12347))
+    sndr_socket.connect((socket.gethostname(), 12349))
     
     try:
         while True:
@@ -19,7 +19,7 @@ def send_data():
             hm = hmac.HMAC(key, hashes.SHA256())
             hm.update(data.encode('utf-8'))
             mac = hm.finalize().hex()
-            sndr_socket.send((key_str+":"+data+":"+mac).encode('utf-8'))
+            sndr_socket.send((key_str+";"+data+";"+mac).encode('utf-8'))
             print("Session", session, "finished.")
     finally:
         sndr_socket.close()
