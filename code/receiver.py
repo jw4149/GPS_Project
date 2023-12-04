@@ -17,7 +17,7 @@ def handle_sndr(sndr_sk, addr):
             session += 1
             print("Entered session: ", session)
 
-            msgs = data.decode('utf-8').split(":")
+            msgs = data.decode('utf-8').split(";")
             key = bytes.fromhex(msgs[0])
             msg = msgs[1]
             mac = bytes.fromhex(msgs[2])

@@ -7,7 +7,7 @@ session = 0
 def send_data(key):
     global session
     sndr_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sndr_socket.connect((socket.gethostname(), 12346))
+    sndr_socket.connect((socket.gethostname(), 12347))
     
     try:
         while True:

@@ -11,17 +11,21 @@ def send_data():
     sndr_socket.connect((socket.gethostname(), 12347))
     
     try:
-        for session in range(1, 6):
+        for session in range(1, 10):
             key_auth = key_chain[session]
             key_send = key_chain[session-1].hex()
             print("Entered session: ", session)
-            data = input("Enter nav data to send: ")
+            file_name = input("Enter filename to send: ")
+            with open(file_name, 'rb') as file:
+                file_data_b = file.read()
+                file_data = file_data_b.decode('utf-8')
+            # data = input("Enter nav data to send: ")
             hm = hmac.HMAC(key_auth, hashes.SHA256())
-            hm.update(data.encode('utf-8'))
+            hm.update(file_data.encode('utf-8'))
             mac = hm.finalize().hex()
-            sndr_socket.send((key_send+":"+data+":"+mac).encode('utf-8'))
+            sndr_socket.send((key_send+";"+file_data+";"+mac).encode('utf-8'))
             print("Key sent in session", session, "is", key_send)
-            print("Just info: Message", data, "can only be authenticated with key", key_auth.hex())
+            print("Just info: Message", file_data, "can only be authenticated with key", key_auth.hex())
             print("Session", session, "finished.")
     finally:
         sndr_socket.close()
