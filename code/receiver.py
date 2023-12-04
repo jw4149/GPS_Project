@@ -1,6 +1,8 @@
 import socket
 import threading
-from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.primitives import hashes, hmac, serialization
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.exceptions import InvalidSignature
 
@@ -13,7 +15,7 @@ def handle_sndr(sndr_sk, addr):
     global session, prev_msg, prev_key, prev_mac
     try:
         while True:
-            data = sndr_sk.recv(1024)
+            data = sndr_sk.recv(4096)
             session += 1
             print("Entered session: ", session)
 
@@ -25,9 +27,27 @@ def handle_sndr(sndr_sk, addr):
 
             if session == 1:
                 # No verification to do
-                prev_msg = msg
-                prev_key = key
-                prev_mac = mac
+                try:
+                    prev_msg = msg
+                    prev_key = key
+                    prev_mac = mac
+                    pk_b = bytes.fromhex(msgs[3])
+                    sig = bytes.fromhex(msgs[4])
+                    pk = serialization.load_pem_public_key(
+                        pk_b,
+                        backend=default_backend()
+                    )
+                    pk.verify(
+                        sig,
+                        msgs[0].encode('utf-8'),
+                        padding.PSS(
+                            mgf=padding.MGF1(hashes.SHA256()),
+                            salt_length=padding.PSS.MAX_LENGTH
+                        ),
+                        hashes.SHA256()
+                    )
+                except InvalidSignature:
+                    print("pk-sk validation did not pass.")
                 print("Session", session, "finished.")
             else:
                 # Verify the prev_msg with received key
@@ -54,7 +74,7 @@ def handle_sndr(sndr_sk, addr):
 
 def receive_data():
     rcv_sk = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    rcv_sk.bind((socket.gethostname(), 12347))
+    rcv_sk.bind((socket.gethostname(), 12348))
     rcv_sk.listen(5)
 
     print("Receiver ready.")
