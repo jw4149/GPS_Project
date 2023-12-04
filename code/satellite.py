@@ -4,8 +4,21 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 
-# session = 0
 key_chain = []
+private_key = rsa.generate_private_key(
+    public_exponent=65537, 
+    key_size=2048,
+    backend=default_backend()
+)
+public_key = private_key.public_key()
+pem_public_key = public_key.public_bytes(
+    encoding=serialization.Encoding.PEM,
+    format=serialization.PublicFormat.SubjectPublicKeyInfo
+)
+
+pk_path = "sat_public_key.pem"
+with open(pk_path, 'wb') as pk_file:
+    pk_file.write(pem_public_key)
 
 def send_data():
     global session
@@ -25,11 +38,6 @@ def send_data():
             hm.update(file_data.encode('utf-8'))
             mac = hm.finalize().hex()
             if session == 1:
-                private_key = rsa.generate_private_key(
-                    public_exponent=65537, 
-                    key_size=2048,
-                    backend=default_backend()
-                )
                 signature = private_key.sign(
                     key_send.encode('utf-8'),
                     padding.PSS(
@@ -37,11 +45,6 @@ def send_data():
                         salt_length=padding.PSS.MAX_LENGTH
                     ),
                     hashes.SHA256()
-                )
-                public_key = private_key.public_key()
-                pem_public_key = public_key.public_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PublicFormat.SubjectPublicKeyInfo
                 )
                 sndr_socket.send((key_send+";"+file_data+";"+mac+";"+pem_public_key.hex()+";"+signature.hex()).encode('utf-8'))
             else:
@@ -65,7 +68,7 @@ if __name__ == '__main__':
 
     digest = hashes.Hash(hashes.SHA256())
     key = key_N
-    for i in range(5):
+    for i in range(9):
         digest.update(key)
         key = digest.finalize()
         key_chain.insert(0, key)
