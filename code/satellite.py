@@ -26,7 +26,7 @@ def send_data():
     sndr_socket.connect((socket.gethostname(), 12349))
     
     try:
-        for session in range(1, 10):
+        for session in range(1, 9):
             key_auth = key_chain[session]
             key_send = key_chain[session-1].hex()
             print("Entered session: ", session)
@@ -56,19 +56,19 @@ def send_data():
         sndr_socket.close()
 
 if __name__ == '__main__':
-    salt = b'1'
+    salt = b'999'
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
         salt=salt,
         iterations=480000,
     )
-    key_N = kdf.derive(b"gps authentication key")
+    key_N = kdf.derive(b"gnss05")
     key_chain.append(key_N)
 
     digest = hashes.Hash(hashes.SHA256())
     key = key_N
-    for i in range(9):
+    for i in range(10):
         digest.update(key)
         key = digest.finalize()
         key_chain.insert(0, key)

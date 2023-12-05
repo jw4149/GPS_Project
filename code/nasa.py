@@ -20,6 +20,7 @@ pem_public_key_nasa = public_key_nasa.public_bytes(
 nasa_pk_path = "nasa_public_key.pem"
 with open(nasa_pk_path, 'wb') as nasa_pk_file:
     nasa_pk_file.write(pem_public_key_nasa)
+    print("NASA public key saved to", nasa_pk_path)
 
 sat_pk_path = "sat_public_key.pem"
 
@@ -55,5 +56,6 @@ pem_certificate = certificate.public_bytes(encoding=serialization.Encoding.PEM)
 cert_path = "cert.pem"
 with open(cert_path, 'wb') as cert_file:
     cert_file.write(pem_certificate)
+    print("Certificate generated for satellite public key")
 
 
